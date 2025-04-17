@@ -1,6 +1,6 @@
 # summary
 
-Summary of a command.
+Allows you to define and create a permission set.
 
 # description
 

@@ -1,6 +1,8 @@
+import fs from 'node:fs/promises';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-// const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');
+import { XMLBuilder } from 'fast-xml-parser';
+import PermissionSetGenerator from '../../../metadataTypes/permissionSetGenerator.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('afterburner', 'mdx.create.permissionset');
@@ -19,7 +21,7 @@ export default class MdxCreatePermissionset extends SfCommand<MdxCreatePermissio
       summary: messages.getMessage('flags.name.summary'),
       description: messages.getMessage('flags.name.description'),
       char: 'n',
-      required: false,
+      required: true,
     }),
     description: Flags.string({
       summary: messages.getMessage('flags.description.summary'),
@@ -37,27 +39,40 @@ export default class MdxCreatePermissionset extends SfCommand<MdxCreatePermissio
     'output-dir': Flags.directory({
       summary: messages.getMessage('flags.output-dir.summary'),
       char: 'd',
+      default: 'force-app/main/default/permissionsets',
     }),
   };
 
   public async run(): Promise<MdxCreatePermissionsetResult> {
     const { flags } = await this.parse(MdxCreatePermissionset);
 
-    const name = flags.name ?? 'world';
-    this.log(`hello ${name} from src/commands/mdx/create/permissionset.ts`);
+    const generator = new PermissionSetGenerator(
+      flags.label,
+      flags.description ?? '',
+      flags['has-activation-required']
+    );
+
+    // TODO: extract out XML options and writing logic to separate class
+    const defaultXmlOptions = {
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_',
+      indentBy: '  ',
+      textNodeName: '#text',
+      format: true,
+      // You need this to preserve boolean values!
+      suppressBooleanAttributes: false,
+    };
+
+    const metadataJson = generator.returnObjectRespresentation();
+
+    const parser = new XMLBuilder(defaultXmlOptions);
+    const xml = parser.build(metadataJson);
+
+    await fs.mkdir(flags['output-dir'], { recursive: true });
+    await fs.writeFile(`${flags['output-dir']}/${flags.name}.permissionset-meta.xml`, xml);
+
     return {
       path: 'src/commands/mdx/create/permissionset.ts',
     };
   }
 }
-
-/*
-
-<?xml version="1.0" encoding="UTF-8"?>
-<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>This is a demo</description>
-    <hasActivationRequired>false</hasActivationRequired>
-    <label>demo</label>
-</PermissionSet>
-
-*/
