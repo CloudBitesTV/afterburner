@@ -9,7 +9,7 @@ export default class PermissionSetGenerator {
     this.#activationRequired = activationRequired;
   }
 
-  public returnObjectRespresentation(): object {
+  public returnObjectRepresentation(): object {
     const jsonObject = {
       '?xml': {
         '@_version': '1.0',

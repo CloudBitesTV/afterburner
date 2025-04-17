@@ -3,6 +3,7 @@ import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 import { XMLBuilder } from 'fast-xml-parser';
 import PermissionSetGenerator from '../../../metadataTypes/permissionSetGenerator.js';
+import { defaultXmlOptions } from '../../../common/configs.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('afterburner', 'mdx.create.permissionset');
@@ -52,18 +53,8 @@ export default class MdxCreatePermissionset extends SfCommand<MdxCreatePermissio
       flags['has-activation-required']
     );
 
-    // TODO: extract out XML options and writing logic to separate class
-    const defaultXmlOptions = {
-      ignoreAttributes: false,
-      attributeNamePrefix: '@_',
-      indentBy: '  ',
-      textNodeName: '#text',
-      format: true,
-      // You need this to preserve boolean values!
-      suppressBooleanAttributes: false,
-    };
-
-    const metadataJson = generator.returnObjectRespresentation();
+    // TODO: extract out XML options and writing logic to separate class;
+    const metadataJson = generator.returnObjectRepresentation();
 
     const parser = new XMLBuilder(defaultXmlOptions);
     const xml = parser.build(metadataJson);
