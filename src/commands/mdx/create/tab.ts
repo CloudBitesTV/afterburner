@@ -28,6 +28,11 @@ export default class MdxCreateTab extends SfCommand<MdxCreateTabResult> {
       summary: messages.getMessage('flags.description.summary'),
       char: 'c',
     }),
+    'output-dir': Flags.directory({
+      summary: messages.getMessage('flags.output-dir.summary'),
+      char: 'd',
+      default: 'force-app/main/default/tabs',
+    }),
   };
 
   public async run(): Promise<MdxCreateTabResult> {
@@ -40,10 +45,10 @@ export default class MdxCreateTab extends SfCommand<MdxCreateTabResult> {
     const parser = new XMLBuilder(defaultXmlOptions);
     const xml = parser.build(metadataJson);
 
-    await fs.mkdir('force-app/main/default/tabs', { recursive: true });
-    await fs.writeFile(`force-app/main/default/tabs/${flags.name}.tab-meta.xml`, xml);
-    // await fs.mkdir(flags['output-dir'], { recursive: true });
-    // await fs.writeFile(`${flags['output-dir']}/${flags.name}.tab-meta.xml`, xml);
+    // await fs.mkdir('force-app/main/default/tabs', { recursive: true });
+    // await fs.writeFile(`force-app/main/default/tabs/${flags.name}.tab-meta.xml`, xml);
+    await fs.mkdir(flags['output-dir'], { recursive: true });
+    await fs.writeFile(`${flags['output-dir']}/${flags.name}.tab-meta.xml`, xml);
 
     const name = flags.name ?? 'world';
     this.log(`hello ${name} from src/commands/mdx/create/tab.ts`);
