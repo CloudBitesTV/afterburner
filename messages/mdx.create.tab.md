@@ -21,3 +21,7 @@ More information about a flag. Don't repeat the summary.
 # flags.description.summary
 
 This is the description of the tab metadata.
+
+# flags.output-dir.summary
+
+Project folder for output of the new metadata file.
