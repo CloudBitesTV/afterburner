@@ -3,6 +3,7 @@
   "description": "A tool to help you build lightning apps through the command line",
   "version": "1.0.0",
   "dependencies": {
+    "@inquirer/prompts": "^7.5.1",
     "@oclif/core": "^4",
     "@salesforce/core": "^8",
     "@salesforce/sf-plugins-core": "^12",
@@ -52,6 +53,9 @@
         "subtopics": {
           "create": {
             "description": "description for mdx.create"
+          },
+          "generate": {
+            "description": "description for mdx.generate"
           }
         }
       }
