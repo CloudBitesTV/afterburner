@@ -1,7 +1,11 @@
+import * as child from 'node:child_process';
+import * as util from 'node:util';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 import { input, confirm } from '@inquirer/prompts';
 import MdxCreateApp from '../create/app.js';
+
+const exec = util.promisify(child.exec);
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('afterburner', 'mdx.generate.application');
@@ -34,12 +38,12 @@ export default class MdxGenerateApplication extends SfCommand<MdxGenerateApplica
     const objectNameAnswer = await input({ message: 'What is the name of the object you wish to create?' });
     this.log(`Our object will be called ${objectNameAnswer}`);
 
-    // Try using the plugin's command reference
-    // await this.config.runCommand('schema:generate:sobject', ['-l', objectNameAnswer]);
-    // await this.config.runCommand('version');
-
     const startsWithVowelAnswer = await confirm({ message: "Does the object's name start with a vowel sound?" });
     this.log(`Does our object start with a vowel? ${startsWithVowelAnswer}`);
+
+    const version = await exec(`sf schema generate sobject --label ${objectNameAnswer}`);
+    this.log(version.stdout);
+
     return {
       path: 'src/commands/mdx/generate/application.ts',
     };
